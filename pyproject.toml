@@ -2,6 +2,10 @@
 name = "sumo-tracker"
 version = "0.1.0"
 description = "Sumo wrestling match tracking system"
+requires-python = ">=3.9"
+authors = [
+    {name = "Sumo Tracker Contributors"}
+]
 dependencies = [
     "SQLAlchemy>=2.0.0",
     "requests>=2.31.0",
@@ -11,6 +15,12 @@ dependencies = [
     "pytest>=7.4.0",
     "ruff>=0.1.0",
 ]
+
+[project.scripts]
+sumo-scrape = "sumo_tracker.initial_data_dump:main"
+sumo-test = "sumo_tracker.test_scrape:main"
+sumo-query = "sumo_tracker.query_matches:main"
+sumo-daily = "sumo_tracker.daily_update:main"
 
 [build-system]
 requires = ["hatchling"]
