@@ -22,8 +22,8 @@ A Python-based tool for tracking sumo wrestling matches from the Japan Sumo Asso
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/sumo-tracker.git
-cd sumo-tracker
+git clone https://github.com/suineg/SumoTracker.git
+cd SumoTracker
 ```
 
 2. Create and activate a virtual environment:
