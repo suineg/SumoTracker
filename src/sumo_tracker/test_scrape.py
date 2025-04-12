@@ -20,12 +20,12 @@ def store_test_matches(session, matches: list[Match], tournament_id: int) -> tup
     
     # Get existing matches for this tournament
     existing_matches = set(
-        (m.tournament_id, m.wrestler_name, m.opponent_name, m.match_date)
+        (m.tournament_id, m.winner_name, m.loser_name, m.match_date)
         for m in session.query(Match).filter(Match.tournament_id == tournament_id).all()
     )
     
     for match in matches:
-        match_key = (match.tournament_id, match.wrestler_name, match.opponent_name, match.match_date)
+        match_key = (match.tournament_id, match.winner_name, match.loser_name, match.match_date)
         
         if match_key not in existing_matches:
             try:
@@ -87,7 +87,7 @@ def main():
                 for match in div_matches:
                     result = "won" if match.win_loss == "win" else "lost"
                     technique = f"by {match.winning_technique}" if match.win_loss == "win" else ""
-                    logger.info(f"{match.wrestler_name} {result} against {match.opponent_name} {technique}")
+                    logger.info(f"{match.winner_name} {result} against {match.loser_name} {technique}")
                 
         finally:
             session.close()

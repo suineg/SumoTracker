@@ -37,6 +37,7 @@ ENV/
 *.log
 .env
 .env.*
+cache/
 
 # OS specific
 .DS_Store

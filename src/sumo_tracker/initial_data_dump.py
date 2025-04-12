@@ -5,6 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.exc import IntegrityError
 from typing import List, Dict, Optional, Tuple, Set
 import time
+import os
+import shutil
 
 from sumo_tracker.scrapers.match_scraper import SumoWebsiteScraper
 from sumo_tracker.models import init_db, Match
@@ -33,12 +35,12 @@ def store_matches(session, matches: List[Match], tournament_id: int) -> Tuple[in
     
     # Get existing matches for this tournament
     existing_matches = set(
-        (m.tournament_id, m.wrestler_name, m.opponent_name, m.match_date)
+        (m.tournament_id, m.winner_name, m.loser_name, m.match_date)
         for m in session.query(Match).filter(Match.tournament_id == tournament_id).all()
     )
     
     for match in matches:
-        match_key = (match.tournament_id, match.wrestler_name, match.opponent_name, match.match_date)
+        match_key = (match.tournament_id, match.winner_name, match.loser_name, match.match_date)
         
         if match_key not in existing_matches:
             try:
@@ -63,6 +65,17 @@ def store_matches(session, matches: List[Match], tournament_id: int) -> Tuple[in
     
     return len(matches), stored_count
 
+def clear_cache():
+    """Clear the cache directory."""
+    cache_dir = "cache"
+    if os.path.exists(cache_dir):
+        shutil.rmtree(cache_dir)
+        os.makedirs(cache_dir)
+        logger.info(f"Cleared cache directory: {cache_dir}")
+
+# Call this before creating the scraper if you think the cache is corrupted
+# clear_cache()
+
 def get_tournament_info(tournament_id: int) -> Optional[str]:
     """Get tournament name based on ID."""
     # Tournament IDs are sequential, with 628 being March 2025
@@ -82,11 +95,11 @@ def main():
         
         try:
             # Create scraper instance
-            scraper = SumoWebsiteScraper()
+            scraper = SumoWebsiteScraper(use_cache=True)
             
             # List of recent tournaments to scrape (March 2025 and earlier)
             # Tournament IDs are sequential, with 628 being March 2025
-            tournaments_to_scrape = list(range(628, 623, -1))  # Last 5 tournaments
+            tournaments_to_scrape = list(range(628, 626, -1))  # Last 3 tournaments
             
             total_matches = 0
             total_stored = 0
@@ -120,7 +133,7 @@ def main():
                         logger.info(f"Found {matches_found} matches, stored {stored_count} new matches")
                         
                         # Add a small delay between tournaments
-                        time.sleep(1)
+                        time.sleep(8)
                     else:
                         logger.warning(f"No matches found for tournament {tournament_id}")
                 else:
